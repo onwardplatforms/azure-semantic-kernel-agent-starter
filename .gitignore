@@ -61,6 +61,26 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# Database files
+app.db
+*.db
+
+# .NET build artifacts
+**/bin/
+**/obj/
+*.dll
+*.pdb
+*.cache
+
+# Node.js
+node_modules/
+.next/
+out/
+.env*.local
+
+# Reference material (contains separate git repo)
+reference-material/
+
 # Flask stuff:
 instance/
 .webassets-cache

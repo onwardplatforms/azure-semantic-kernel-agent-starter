@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  agent-starter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"    # UI
+      - "5001:5001"    # Hello Agent
+      - "5002:5002"    # Goodbye Agent  
+      - "5003:5003"    # Runtime API
+      - "5004:5004"    # Math Agent
+      - "5005:5005"    # MCP Server
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+      - DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+      - SYNC_DATABASE_URL=sqlite:///./data/app.db
+      - DATABASE_ECHO=false
+      - LOG_LEVEL=INFO
+      - DEBUG=false
+      - CONTAINER_MODE=true
+      - API_HOST=0.0.0.0
+      - API_PORT=5003
+      - MCP_SERVER_HOST=0.0.0.0
+      - MCP_SERVER_PORT=5005
+      - HELLO_AGENT_ENDPOINT=http://localhost:5001/api/message
+      - GOODBYE_AGENT_ENDPOINT=http://localhost:5002/api/message
+      - MATH_AGENT_ENDPOINT=http://localhost:5004/api/message
+      - CORS_ORIGINS=*
+    volumes:
+      - agent_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  agent_data:
+    driver: local
+
+networks:
+  default:
+    name: agent-starter-network
